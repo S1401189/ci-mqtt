@@ -7,24 +7,25 @@ ESP8266.onMQTTDisonnected(function () {
 ESP8266.onMQTTConnected(function () {
     basic.showIcon(IconNames.Heart)
 })
-ESP8266.initializeWifi(SerialPin.P0, SerialPin.P0, BaudRate.BaudRate115200)
+ESP8266.initializeWifi(SerialPin.P1, SerialPin.P2, BaudRate.BaudRate115200)
 ESP8266.setWifi("Logos_Other", "Wifi2235")
 ESP8266.setMQTT(
-"broker.mqttdashboard.com",
-8000,
+"broker.hivemq.com",
+1883,
 "",
 "",
 ""
 )
 let trigger = false
 let here = false
+basic.pause(5000)
 ESP8266.connectmqtt()
 basic.forever(function () {
-    if (pins.digitalReadPin(DigitalPin.P1) == 0) {
+    if (pins.digitalReadPin(DigitalPin.P8) == 0) {
         trigger = false
         for (let index = 0; index <= 30; index++) {
             basic.pause(1000)
-            if (pins.digitalReadPin(DigitalPin.P1) == 1) {
+            if (pins.digitalReadPin(DigitalPin.P8) == 1) {
                 trigger = true
                 break;
             }
@@ -36,5 +37,12 @@ basic.forever(function () {
         }
     } else {
         here = true
+    }
+})
+basic.forever(function () {
+    if (here) {
+        ESP8266.mqttpub("testtopic/18193", "Available")
+    } else {
+        ESP8266.mqttpub("testtopic/18193", "Do Not Disturb")
     }
 })
